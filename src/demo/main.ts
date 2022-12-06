@@ -2,7 +2,7 @@ import { WorkerModule, createWorkerBridge } from '@/index';
 import { ChildModule } from './worker';
 
 export class MainModule implements WorkerModule {
-  [method: string | symbol]: (...args: any[]) => Promise<any>;
+  [method: string]: (...args: any[]) => Promise<any>;
 
   constructor() {}
 
@@ -22,7 +22,7 @@ export class MainModule implements WorkerModule {
 const selfModule = new MainModule();
 const bridge = createWorkerBridge(
   selfModule,
-  '/src/demo/worker.ts'
+  '/dist/wwb.umd.js'
 ) as ChildModule;
 
 setTimeout(() => {
@@ -45,4 +45,4 @@ setTimeout(() => {
     .catch((e) => {
       console.log('[main]', 'childModule.outputErrorInWorker error: ', e);
     });
-}, 5000);
+}, 10000);

@@ -3,21 +3,21 @@ import { isFunction, isPromise } from './typeAssert';
 
 export interface BridgeCallMessage {
   name: 'call';
-  method: string | symbol;
+  method: string;
   callId: string;
   data: any[];
 }
 
 export interface BridgeResultMessage {
   name: 'result';
-  method: string | symbol;
+  method: string;
   callId: string;
   error?: Error;
   data?: any;
 }
 
 export interface WorkerModule {
-  [method: string | symbol]: (...args: any[]) => Promise<any>;
+  [method: string]: (...args: any[]) => Promise<any>;
 }
 
 const bridgeMap: { [key: string]: WorkerModule } = {};
@@ -133,7 +133,7 @@ export function createWorkerBridge(
     }
   }
 
-  async function callMethod(methodName: string | symbol, data: any[]) {
+  async function callMethod(methodName: string, data: any[]) {
     return new Promise<any>((resolve, reject) => {
       const callId = guid();
       resultCallbackMap.set(callId, { resolve, reject });
@@ -147,7 +147,7 @@ export function createWorkerBridge(
   }
 
   bridgeMap[singleKey] = new Proxy(proxyTarget, {
-    get(target, p, receiver) {
+    get(target, p: string, receiver) {
       return async function (...args: any[]): Promise<any> {
         return callMethod(p, args);
       };
